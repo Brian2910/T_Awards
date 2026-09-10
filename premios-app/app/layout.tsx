@@ -3,8 +3,8 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ceremonia de Premios",
-  description: "Votación para la ceremonia de premios",
+  title: "Trolas Awards",
+  description: "Votación para la ceremonia Trolas Awards",
 };
 
 export default function RootLayout({

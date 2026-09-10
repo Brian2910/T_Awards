@@ -40,7 +40,7 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "No se pudo registrar el voto.");
+      setError(data.error ?? "No se pudo registrar el voto. Intentá de nuevo.");
       setStatus("error");
       return;
     }
@@ -48,13 +48,16 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
     setStatus("done");
   }
 
+  const typeLabel = { TEXT: "Texto", PHOTO: "Foto", AUDIO: "Audio" }[type];
+
   return (
     <div className="vote-card">
+      <span className="vote-card-type">{typeLabel}</span>
       <h2>{name}</h2>
       {description && <p className="vote-card-desc">{description}</p>}
 
       {status === "done" ? (
-        <p className="vote-card-done">Ya votaste en esta categoría ✓</p>
+        <p className="vote-card-done">Voto registrado ✓</p>
       ) : (
         <form onSubmit={handleSubmit}>
           {type === "TEXT" && (

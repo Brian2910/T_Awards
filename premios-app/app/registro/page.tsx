@@ -49,7 +49,8 @@ export default function RegistroPage() {
   return (
     <main className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>Crear cuenta</h1>
+        <h1>Creá tu cuenta</h1>
+        <p className="auth-subtitle">La necesitás para votar en las categorías de la ceremonia.</p>
 
         <label>
           Nombre

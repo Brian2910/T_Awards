@@ -12,9 +12,12 @@ model User {
   name      String
   email     String   @unique
   password  String
+  image     String?
+  points    Int      @default(0)
   createdAt DateTime @default(now())
 
-  votes Vote[]
+  votes             Vote[]
+  pointTransactions PointTransaction[]
 }
 
 enum CategoryType {
@@ -47,4 +50,26 @@ model Vote {
 
   // Un usuario solo puede votar una vez por categoría
   @@unique([userId, categoryId])
+}
+
+model Game {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  transactions PointTransaction[]
+}
+
+model PointTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String?
+  points    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  game Game? @relation(fields: [gameId], references: [id])
 }

@@ -22,7 +22,7 @@ export default async function VotarPage() {
   return (
     <main className="votar-page">
       <header className="votar-header">
-        <h1>Votá las categorías</h1>
+        <h1>Votá las categorías, Trola</h1>
         <p>Hola {session.user.name}, elegí tu respuesta en cada categoría.</p>
       </header>
 

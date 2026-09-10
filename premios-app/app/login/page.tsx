@@ -35,7 +35,8 @@ export default function LoginPage() {
   return (
     <main className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>Iniciar sesión</h1>
+        <img src="/trolas-awards-logo.gif" alt="Trolas Awards" className="brand-logo" />
+        <p className="auth-subtitle">Usá el email y la contraseña con los que te registraste.</p>
 
         <label>
           Email
