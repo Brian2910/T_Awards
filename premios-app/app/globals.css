@@ -590,14 +590,19 @@ button.home-cta {
 
 /* ---------- Navegación ---------- */
 
-.back-link {
+.back-cta {
   display: inline-block;
-  margin-bottom: 1.25rem;
-  font-size: 0.85rem;
-  color: var(--pink-soft);
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #2a0512;
+  font-weight: 600;
+  font-size: 0.95rem;
   text-decoration: none;
+  transition: background 0.15s ease;
 }
 
-.back-link:hover {
-  text-decoration: underline;
+.back-cta:hover {
+  background: var(--pink-soft);
 }
