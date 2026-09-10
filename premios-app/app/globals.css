@@ -468,3 +468,86 @@ a {
   color: var(--text);
   font-weight: 600;
 }
+
+/* ---------- Admin ---------- */
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 700px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-line);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.admin-card-wide {
+  grid-column: 1 / -1;
+}
+
+.admin-card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.admin-form input,
+.admin-form select {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--surface-line);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.admin-form button {
+  padding: 0.6rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #2a0512;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-form button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.admin-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-height: 220px;
+  overflow-y: auto;
+}

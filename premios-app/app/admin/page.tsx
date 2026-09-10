@@ -1,0 +1,49 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions, isAdmin } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import AdminPanel from "./AdminPanel";
+
+export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    redirect("/login");
+  }
+  if (!isAdmin(session.user.email)) {
+    redirect("/");
+  }
+
+  const [games, users, transactions] = await Promise.all([
+    prisma.game.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.user.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, email: true, points: true },
+    }),
+    prisma.pointTransaction.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      include: {
+        user: { select: { name: true } },
+        game: { select: { name: true } },
+      },
+    }),
+  ]);
+
+  return (
+    <main className="votar-page">
+      <header className="votar-header">
+        <h1>Panel del organizador</h1>
+        <p>Cargá los juegos de la ceremonia y otorgá puntos a medida que se juegan.</p>
+      </header>
+
+      <AdminPanel
+        initialGames={games}
+        initialUsers={users}
+        initialTransactions={transactions.map((t) => ({
+          ...t,
+          createdAt: t.createdAt.toISOString(),
+        }))}
+      />
+    </main>
+  );
+}

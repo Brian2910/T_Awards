@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // POST /api/points -> registra una transacción de puntos y actualiza el total del usuario.
@@ -8,9 +8,8 @@ import { prisma } from "@/lib/prisma";
 // Body: { userId, points, reason, gameId? }
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  const adminEmail = process.env.ADMIN_EMAIL;
 
-  if (!session?.user || !adminEmail || session.user.email !== adminEmail) {
+  if (!isAdmin(session?.user?.email)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 

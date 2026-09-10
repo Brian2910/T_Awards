@@ -3,6 +3,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
+export function isAdmin(email?: string | null) {
+  return !!email && !!process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL;
+}
+
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   pages: {

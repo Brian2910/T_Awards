@@ -1,9 +1,10 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions, isAdmin } from "@/lib/auth";
 import SignOutButton from "./SignOutButton";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  const admin = isAdmin(session?.user?.email);
 
   return (
     <main className="home-page">
@@ -25,6 +26,7 @@ export default async function Home() {
           {session?.user ? (
             <>
               <a href="/perfil">Mi perfil</a>
+              {admin && <a href="/admin">Panel admin</a>}
               <SignOutButton />
             </>
           ) : (
