@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function VoteCard({ categoryId, name, description, type, alreadyVoted }: Props) {
+  const [open, setOpen] = useState(false);
   const [textAnswer, setTextAnswer] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
@@ -46,54 +47,75 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
     }
 
     setStatus("done");
+    setOpen(false);
   }
 
   const typeLabel = { TEXT: "Texto", PHOTO: "Foto", AUDIO: "Audio" }[type];
+  const isDone = status === "done";
 
   return (
     <div className="vote-card">
-      <span className="vote-card-type">{typeLabel}</span>
-      <h2>{name}</h2>
-      {description && <p className="vote-card-desc">{description}</p>}
+      <button
+        type="button"
+        className="vote-card-header"
+        onClick={() => !isDone && setOpen(!open)}
+        disabled={isDone}
+      >
+        <div className="vote-card-header-text">
+          <span className="vote-card-type">{typeLabel}</span>
+          <h2>{name}</h2>
+        </div>
+        {isDone ? (
+          <span className="vote-card-check">✓</span>
+        ) : (
+          <span className={`vote-card-chevron ${open ? "vote-card-chevron-open" : ""}`}>
+            ⌄
+          </span>
+        )}
+      </button>
 
-      {status === "done" ? (
-        <p className="vote-card-done">Voto registrado ✓</p>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          {type === "TEXT" && (
-            <textarea
-              placeholder="Escribí tu respuesta"
-              value={textAnswer}
-              onChange={(e) => setTextAnswer(e.target.value)}
-              required
-              rows={3}
-            />
-          )}
+      {isDone && <p className="vote-card-done">Voto registrado ✓</p>}
 
-          {type === "PHOTO" && (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              required
-            />
-          )}
+      {!isDone && open && (
+        <div className="vote-card-body">
+          {description && <p className="vote-card-desc">{description}</p>}
 
-          {type === "AUDIO" && (
-            <input
-              type="file"
-              accept="audio/*"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              required
-            />
-          )}
+          <form onSubmit={handleSubmit}>
+            {type === "TEXT" && (
+              <textarea
+                placeholder="Escribí tu respuesta"
+                value={textAnswer}
+                onChange={(e) => setTextAnswer(e.target.value)}
+                required
+                rows={3}
+              />
+            )}
 
-          {error && <p className="vote-card-error">{error}</p>}
+            {type === "PHOTO" && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                required
+              />
+            )}
 
-          <button type="submit" disabled={status === "sending"}>
-            {status === "sending" ? "Enviando..." : "Votar"}
-          </button>
-        </form>
+            {type === "AUDIO" && (
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                required
+              />
+            )}
+
+            {error && <p className="vote-card-error">{error}</p>}
+
+            <button type="submit" disabled={status === "sending"}>
+              {status === "sending" ? "Enviando..." : "Votar"}
+            </button>
+          </form>
+        </div>
       )}
     </div>
   );
