@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import BackLink from "../BackLink";
 
 export default function RegistroPage() {
   const router = useRouter();
@@ -48,9 +49,11 @@ export default function RegistroPage() {
 
   return (
     <main className="auth-page">
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>Creá tu cuenta</h1>
-        <p className="auth-subtitle">La necesitás para votar en las categorías de la ceremonia.</p>
+      <div className="auth-wrap">
+        <BackLink href="/" label="Inicio" />
+        <form className="auth-form" onSubmit={handleSubmit}>
+        <img src="/trolas-awards-logo.gif" alt="Trolas Awards" className="brand-logo" />
+        <p className="auth-subtitle">Creá tu cuenta para votar en las categorías de la ceremonia.</p>
 
         <label>
           Nombre
@@ -88,6 +91,7 @@ export default function RegistroPage() {
           ¿Ya tenés cuenta? <a href="/login">Iniciar sesión</a>
         </p>
       </form>
+      </div>
     </main>
   );
 }

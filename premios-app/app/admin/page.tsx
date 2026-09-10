@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminPanel from "./AdminPanel";
+import BackLink from "../BackLink";
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -31,6 +32,7 @@ export default async function AdminPage() {
 
   return (
     <main className="votar-page">
+      <BackLink href="/" label="Inicio" />
       <header className="votar-header">
         <h1>Panel del organizador</h1>
         <p>Cargá los juegos de la ceremonia y otorgá puntos a medida que se juegan.</p>

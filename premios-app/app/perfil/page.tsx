@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ProfileForm from "./ProfileForm";
+import BackLink from "../BackLink";
 
 export default async function PerfilPage() {
   const session = await getServerSession(authOptions);
@@ -30,6 +31,7 @@ export default async function PerfilPage() {
 
   return (
     <main className="perfil-page">
+      <BackLink href="/" label="Inicio" />
       <header className="votar-header">
         <h1>Mi perfil</h1>
         <p>{user.email}</p>

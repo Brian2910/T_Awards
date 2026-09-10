@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import BackLink from "../BackLink";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +35,9 @@ export default function LoginPage() {
 
   return (
     <main className="auth-page">
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <div className="auth-wrap">
+        <BackLink href="/" label="Inicio" />
+        <form className="auth-form" onSubmit={handleSubmit}>
         <img src="/trolas-awards-logo.gif" alt="Trolas Awards" className="brand-logo" />
         <p className="auth-subtitle">Usá el email y la contraseña con los que te registraste.</p>
 
@@ -68,6 +71,7 @@ export default function LoginPage() {
           ¿No tenés cuenta? <a href="/registro">Registrarme</a>
         </p>
       </form>
+      </div>
     </main>
   );
 }

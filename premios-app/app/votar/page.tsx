@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import VoteCard from "./VoteCard";
+import BackLink from "../BackLink";
 
 export default async function VotarPage() {
   const session = await getServerSession(authOptions);
@@ -21,8 +22,9 @@ export default async function VotarPage() {
 
   return (
     <main className="votar-page">
+      <BackLink href="/" label="Inicio" />
       <header className="votar-header">
-        <h1>Votá las categorías, Trola</h1>
+        <h1>Votá las categorías</h1>
         <p>Hola {session.user.name}, elegí tu respuesta en cada categoría.</p>
       </header>
 

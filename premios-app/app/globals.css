@@ -54,6 +54,11 @@ a {
   padding: 2rem;
 }
 
+.auth-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
 .auth-form {
   width: 100%;
   max-width: 380px;
@@ -550,4 +555,18 @@ a {
   color: var(--text-muted);
   max-height: 220px;
   overflow-y: auto;
+}
+
+/* ---------- Navegación ---------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: var(--pink-soft);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
 }
