@@ -23,7 +23,7 @@ export default async function RespuestasPage() {
     },
   });
 
-  const typeLabel = { TEXT: "Texto", PHOTO: "Foto", AUDIO: "Audio" } as const;
+  const typeLabel = { TEXT: "Texto", TEXT3: "Texto", PHOTO: "Foto", AUDIO: "Audio" } as const;
 
   return (
     <main className="votar-page">
@@ -53,6 +53,12 @@ export default async function RespuestasPage() {
                     <strong>{v.user.name}:</strong>{" "}
                     {c.type === "TEXT" ? (
                       <span>{v.textAnswer}</span>
+                    ) : c.type === "TEXT3" ? (
+                      <ul className="respuestas-multi">
+                        <li>{v.textAnswer}</li>
+                        <li>{v.textAnswer2}</li>
+                        <li>{v.textAnswer3}</li>
+                      </ul>
                     ) : c.type === "PHOTO" ? (
                       <a href={v.fileUrl ?? "#"} target="_blank" rel="noreferrer">
                         Ver foto

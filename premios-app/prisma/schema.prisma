@@ -22,6 +22,7 @@ model User {
 
 enum CategoryType {
   TEXT
+  TEXT3
   PHOTO
   AUDIO
 }
@@ -42,6 +43,8 @@ model Vote {
   userId     String
   categoryId String
   textAnswer String?
+  textAnswer2 String?
+  textAnswer3 String?
   fileUrl    String?
   createdAt  DateTime @default(now())
 

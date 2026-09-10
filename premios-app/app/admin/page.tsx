@@ -14,21 +14,22 @@ export default async function AdminPage() {
     redirect("/");
   }
 
-  const [games, users, transactions] = await Promise.all([
-    prisma.game.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.user.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, email: true, points: true },
-    }),
-    prisma.pointTransaction.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      include: {
-        user: { select: { name: true } },
-        game: { select: { name: true } },
-      },
-    }),
-  ]);
+  const [games, users, transactions, categories] = await Promise.all([
+  prisma.game.findMany({ orderBy: { createdAt: "desc" } }),
+  prisma.user.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, email: true, points: true },
+  }),
+  prisma.pointTransaction.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    include: {
+      user: { select: { name: true } },
+      game: { select: { name: true } },
+    },
+  }),
+  prisma.category.findMany({ orderBy: { createdAt: "desc" } }),
+]);
 
   return (
     <main className="votar-page">
@@ -48,6 +49,7 @@ export default async function AdminPage() {
           ...t,
           createdAt: t.createdAt.toISOString(),
         }))}
+        initialCategories={categories}
       />
     </main>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type CategoryType = "TEXT" | "PHOTO" | "AUDIO";
+type CategoryType = "TEXT" | "TEXT3" | "PHOTO" | "AUDIO";
 
 interface Props {
   categoryId: string;
@@ -15,6 +15,8 @@ interface Props {
 export default function VoteCard({ categoryId, name, description, type, alreadyVoted }: Props) {
   const [open, setOpen] = useState(false);
   const [textAnswer, setTextAnswer] = useState("");
+  const [textAnswer2, setTextAnswer2] = useState("");
+  const [textAnswer3, setTextAnswer3] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
     alreadyVoted ? "done" : "idle"
@@ -30,6 +32,10 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
     formData.append("categoryId", categoryId);
     if (type === "TEXT") {
       formData.append("textAnswer", textAnswer);
+    } else if (type === "TEXT3") {
+      formData.append("textAnswer", textAnswer);
+      formData.append("textAnswer2", textAnswer2);
+      formData.append("textAnswer3", textAnswer3);
     } else if (file) {
       formData.append("file", file);
     }
@@ -50,7 +56,7 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
     setOpen(false);
   }
 
-  const typeLabel = { TEXT: "Texto", PHOTO: "Foto", AUDIO: "Audio" }[type];
+  const typeLabel = { TEXT: "Texto", TEXT3: "Texto", PHOTO: "Foto", AUDIO: "Audio" }[type];
   const isDone = status === "done";
 
   return (
@@ -89,6 +95,32 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
                 required
                 rows={3}
               />
+            )}
+
+            {type === "TEXT3" && (
+              <>
+                <textarea
+                  placeholder="Respuesta 1"
+                  value={textAnswer}
+                  onChange={(e) => setTextAnswer(e.target.value)}
+                  required
+                  rows={2}
+                />
+                <textarea
+                  placeholder="Respuesta 2"
+                  value={textAnswer2}
+                  onChange={(e) => setTextAnswer2(e.target.value)}
+                  required
+                  rows={2}
+                />
+                <textarea
+                  placeholder="Respuesta 3"
+                  value={textAnswer3}
+                  onChange={(e) => setTextAnswer3(e.target.value)}
+                  required
+                  rows={2}
+                />
+              </>
             )}
 
             {type === "PHOTO" && (

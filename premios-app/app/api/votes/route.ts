@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 // POST /api/votes -> registra un voto. Espera multipart/form-data:
-// categoryId (string), textAnswer (string, opcional), file (File, opcional)
+// categoryId (string), textAnswer / textAnswer2 / textAnswer3 (string, según tipo), file (File, opcional)
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -31,6 +31,8 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const categoryId = formData.get("categoryId") as string | null;
   const textAnswer = formData.get("textAnswer") as string | null;
+  const textAnswer2 = formData.get("textAnswer2") as string | null;
+  const textAnswer3 = formData.get("textAnswer3") as string | null;
   const file = formData.get("file") as File | null;
 
   if (!categoryId) {
@@ -56,8 +58,10 @@ export async function POST(req: Request) {
     );
   }
 
+  const isTextType = category.type === "TEXT" || category.type === "TEXT3";
+
   let fileUrl: string | undefined;
-  if (file && category.type !== "TEXT") {
+  if (file && !isTextType) {
     const blob = await put(`votes/${userId}/${categoryId}-${file.name}`, file, {
       access: "public",
     });
@@ -70,7 +74,13 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-  if (category.type !== "TEXT" && !fileUrl) {
+  if (category.type === "TEXT3" && (!textAnswer || !textAnswer2 || !textAnswer3)) {
+    return NextResponse.json(
+      { error: "Esta categoría requiere completar los 3 campos de texto." },
+      { status: 400 }
+    );
+  }
+  if (!isTextType && !fileUrl) {
     return NextResponse.json(
       { error: "Esta categoría requiere subir un archivo." },
       { status: 400 }
@@ -82,6 +92,8 @@ export async function POST(req: Request) {
       userId,
       categoryId,
       textAnswer: textAnswer ?? undefined,
+      textAnswer2: category.type === "TEXT3" ? textAnswer2 ?? undefined : undefined,
+      textAnswer3: category.type === "TEXT3" ? textAnswer3 ?? undefined : undefined,
       fileUrl,
     },
   });
