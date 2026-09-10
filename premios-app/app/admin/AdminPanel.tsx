@@ -61,25 +61,28 @@ export default function AdminPanel({
   const [gameName, setGameName] = useState("");
   const [gameDesc, setGameDesc] = useState("");
   const [creatingGame, setCreatingGame] = useState(false);
+  const [gameError, setGameError] = useState<string | null>(null);
+  const [gameMessage, setGameMessage] = useState<string | null>(null);
 
   const [categoryName, setCategoryName] = useState("");
   const [categoryDesc, setCategoryDesc] = useState("");
   const [categoryType, setCategoryType] = useState<CategoryType>("TEXT");
   const [creatingCategory, setCreatingCategory] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [categoryMessage, setCategoryMessage] = useState<string | null>(null);
 
   const [selectedUser, setSelectedUser] = useState(initialUsers[0]?.id ?? "");
   const [selectedGame, setSelectedGame] = useState("");
   const [points, setPoints] = useState(10);
   const [reason, setReason] = useState("");
   const [awarding, setAwarding] = useState(false);
-
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [pointsError, setPointsError] = useState<string | null>(null);
+  const [pointsMessage, setPointsMessage] = useState<string | null>(null);
 
   async function handleCreateGame(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
+    setGameError(null);
+    setGameMessage(null);
     setCreatingGame(true);
 
     const res = await fetch("/api/games", {
@@ -92,7 +95,7 @@ export default function AdminPanel({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "No se pudo crear el juego.");
+      setGameError(data.error ?? "No se pudo crear el juego.");
       return;
     }
 
@@ -100,13 +103,13 @@ export default function AdminPanel({
     setGames([created, ...games]);
     setGameName("");
     setGameDesc("");
-    setMessage("Juego creado.");
+    setGameMessage("Juego creado.");
   }
 
   async function handleCreateCategory(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
+    setCategoryError(null);
+    setCategoryMessage(null);
     setCreatingCategory(true);
 
     const res = await fetch("/api/categories", {
@@ -123,7 +126,7 @@ export default function AdminPanel({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "No se pudo crear la categoría.");
+      setCategoryError(data.error ?? "No se pudo crear la categoría.");
       return;
     }
 
@@ -132,16 +135,16 @@ export default function AdminPanel({
     setCategoryName("");
     setCategoryDesc("");
     setCategoryType("TEXT");
-    setMessage("Categoría creada.");
+    setCategoryMessage("Categoría creada.");
   }
 
   async function handleAwardPoints(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
+    setPointsError(null);
+    setPointsMessage(null);
 
     if (!selectedUser || !reason.trim()) {
-      setError("Elegí un usuario y escribí un motivo.");
+      setPointsError("Elegí un usuario y escribí un motivo.");
       return;
     }
 
@@ -162,7 +165,7 @@ export default function AdminPanel({
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "No se pudieron otorgar los puntos.");
+      setPointsError(data.error ?? "No se pudieron otorgar los puntos.");
       return;
     }
 
@@ -185,11 +188,8 @@ export default function AdminPanel({
     ]);
 
     setReason("");
-    setMessage("Puntos otorgados.");
+    setPointsMessage("Puntos otorgados.");
   }
-
-  const categoryTypeLabel = (type: CategoryType) =>
-    CATEGORY_TYPE_OPTIONS.find((o) => o.value === type)?.label ?? type;
 
   return (
     <div className="admin-layout">
@@ -226,13 +226,11 @@ export default function AdminPanel({
           </button>
         </form>
 
-        <ul className="admin-list">
-          {categories.map((c) => (
-            <li key={c.id}>
-              {c.name} <span className="admin-tag">({categoryTypeLabel(c.type)})</span>
-            </li>
-          ))}
-        </ul>
+        {(categoryError || categoryMessage) && (
+          <p className={categoryError ? "vote-card-error" : "profile-message"}>
+            {categoryError ?? categoryMessage}
+          </p>
+        )}
       </section>
 
       <section className="admin-card">
@@ -251,11 +249,11 @@ export default function AdminPanel({
           </button>
         </form>
 
-        <ul className="admin-list">
-          {games.map((g) => (
-            <li key={g.id}>{g.name}</li>
-          ))}
-        </ul>
+        {(gameError || gameMessage) && (
+          <p className={gameError ? "vote-card-error" : "profile-message"}>
+            {gameError ?? gameMessage}
+          </p>
+        )}
       </section>
 
       <section className="admin-card">
@@ -307,11 +305,13 @@ export default function AdminPanel({
             {awarding ? "Otorgando..." : "Otorgar puntos"}
           </button>
         </form>
-      </section>
 
-      {(error || message) && (
-        <p className={error ? "vote-card-error" : "profile-message"}>{error ?? message}</p>
-      )}
+        {(pointsError || pointsMessage) && (
+          <p className={pointsError ? "vote-card-error" : "profile-message"}>
+            {pointsError ?? pointsMessage}
+          </p>
+        )}
+      </section>
 
       <section className="admin-card admin-card-wide">
         <h2>Últimos movimientos</h2>

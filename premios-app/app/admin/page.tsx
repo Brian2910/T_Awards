@@ -37,8 +37,11 @@ export default async function AdminPage() {
       <header className="votar-header">
         <h1>Panel del organizador</h1>
         <p>Cargá los juegos de la ceremonia y otorgá puntos a medida que se juegan.</p>
-        <a href="/admin/respuestas" className="admin-link">
+        <a href="/admin/respuestas" className="home-cta">
           Ver respuestas de las categorías →
+        </a>
+        <a href="/admin/juegos" className="home-cta">
+          Ver puntos por juego →
         </a>
       </header>
 

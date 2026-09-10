@@ -4,6 +4,8 @@ import { signOut } from "next-auth/react";
 
 export default function SignOutButton() {
   return (
-    <button onClick={() => signOut({ callbackUrl: "/" })}>Cerrar sesión</button>
+    <button onClick={() => signOut({ callbackUrl: "/" })} className="home-cta">
+      Cerrar sesión
+    </button>
   );
 }

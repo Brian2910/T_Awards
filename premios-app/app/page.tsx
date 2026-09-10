@@ -25,14 +25,18 @@ export default async function Home() {
         <div className="home-secondary">
           {session?.user ? (
             <>
-              <a href="/perfil">Mi perfil</a>
-              {admin && <a href="/admin">Panel admin</a>}
+              <a href="/perfil" className="home-cta">Mi perfil</a>
+              {admin && <a href="/admin" className="home-cta">Panel admin</a>}
               <SignOutButton />
             </>
           ) : (
             <>
-              <a href="/login">Iniciar sesión</a>
-              <a href="/registro">Registrarme</a>
+          <a href="/login" className="home-cta">
+               Iniciar sesión
+          </a>              
+          <a href="/registro" className="home-cta">
+               Registrarme
+          </a>
             </>
           )}
         </div>

@@ -557,6 +557,17 @@ a {
   overflow-y: auto;
 }
 
+.admin-form select {
+  color-scheme: dark;
+  background-color: #6b0f30; /* tu bordo */
+  color: #f7d9e3; /* tu rosa claro */
+}
+
+.admin-form select option {
+  background-color: #6b0f30;
+  color: #f7d9e3;
+}
+
 /* ---------- Navegación ---------- */
 
 .back-link {
