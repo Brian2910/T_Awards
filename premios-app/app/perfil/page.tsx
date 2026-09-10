@@ -20,7 +20,7 @@ export default async function PerfilPage() {
     prisma.user.findMany({
       orderBy: { points: "desc" },
       take: 10,
-      select: { id: true, name: true, points: true },
+      select: { id: true, name: true, image: true, points: true },
     }),
   ]);
 
@@ -48,7 +48,16 @@ export default async function PerfilPage() {
           <ol className="ranking-list">
             {top.map((u) => (
               <li key={u.id} className={u.name === user.name ? "ranking-me" : ""}>
-                <span>{u.name}</span>
+                <span className="ranking-user">
+                  {u.image ? (
+                    <img src={u.image} alt={u.name} className="ranking-avatar" />
+                  ) : (
+                    <span className="ranking-avatar ranking-avatar-placeholder">
+                      {u.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  {u.name}
+                </span>
                 <span>{u.points} pts</span>
               </li>
             ))}

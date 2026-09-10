@@ -494,6 +494,24 @@ button.home-cta {
   font-weight: 600;
 }
 
+.ranking-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ranking-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--pink-soft);
+  font-family: "Fraunces", serif;
+  font-size: 0.85rem;
+}
+
 /* ---------- Admin ---------- */
 
 .admin-layout {
@@ -586,6 +604,38 @@ button.home-cta {
 .admin-form select option {
   background-color: #6b0f30;
   color: #f7d9e3;
+}
+
+.admin-users-list {
+  max-height: none;
+}
+
+.admin-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin-user-email {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.admin-delete-btn {
+  background: none;
+  border: 1px solid var(--error);
+  color: var(--error);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.admin-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 /* ---------- Navegación ---------- */

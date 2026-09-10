@@ -68,7 +68,6 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
         disabled={isDone}
       >
         <div className="vote-card-header-text">
-          <span className="vote-card-type">{typeLabel}</span>
           <h2>{name}</h2>
         </div>
         {isDone ? (

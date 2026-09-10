@@ -38,6 +38,7 @@ interface Props {
   initialUsers: UserRow[];
   initialTransactions: Transaction[];
   initialCategories: Category[];
+  currentUserId: string;
 }
 
 const CATEGORY_TYPE_OPTIONS: { value: CategoryType; label: string }[] = [
@@ -52,11 +53,15 @@ export default function AdminPanel({
   initialUsers,
   initialTransactions,
   initialCategories,
+  currentUserId,
 }: Props) {
   const [games, setGames] = useState(initialGames);
   const [users, setUsers] = useState(initialUsers);
   const [transactions, setTransactions] = useState(initialTransactions);
   const [categories, setCategories] = useState(initialCategories);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [userError, setUserError] = useState<string | null>(null);
+  const [userMessage, setUserMessage] = useState<string | null>(null);
 
   const [gameName, setGameName] = useState("");
   const [gameDesc, setGameDesc] = useState("");
@@ -191,6 +196,37 @@ export default function AdminPanel({
     setPointsMessage("Puntos otorgados.");
   }
 
+  async function handleDeleteUser(userId: string, userName: string) {
+    if (
+      !window.confirm(
+        `¿Eliminar a ${userName}? Se borran también sus votos y su historial de puntos. Esta acción no se puede deshacer.`
+      )
+    ) {
+      return;
+    }
+
+    setUserError(null);
+    setUserMessage(null);
+    setDeletingId(userId);
+
+    const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
+
+    setDeletingId(null);
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setUserError(data.error ?? "No se pudo eliminar el usuario.");
+      return;
+    }
+
+    const remaining = users.filter((u) => u.id !== userId);
+    setUsers(remaining);
+    if (selectedUser === userId) {
+      setSelectedUser(remaining[0]?.id ?? "");
+    }
+    setUserMessage("Usuario eliminado.");
+  }
+
   return (
     <div className="admin-layout">
       <section className="admin-card">
@@ -309,6 +345,35 @@ export default function AdminPanel({
         {(pointsError || pointsMessage) && (
           <p className={pointsError ? "vote-card-error" : "profile-message"}>
             {pointsError ?? pointsMessage}
+          </p>
+        )}
+      </section>
+
+      <section className="admin-card admin-card-wide">
+        <h2>Usuarios</h2>
+        <ul className="admin-list admin-users-list">
+          {users.map((u) => (
+            <li key={u.id} className="admin-user-row">
+              <span>
+                {u.name} <span className="admin-user-email">({u.email})</span> — {u.points} pts
+              </span>
+              {u.id !== currentUserId && (
+                <button
+                  type="button"
+                  className="admin-delete-btn"
+                  onClick={() => handleDeleteUser(u.id, u.name)}
+                  disabled={deletingId === u.id}
+                >
+                  {deletingId === u.id ? "Eliminando..." : "Eliminar"}
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {(userError || userMessage) && (
+          <p className={userError ? "vote-card-error" : "profile-message"}>
+            {userError ?? userMessage}
           </p>
         )}
       </section>

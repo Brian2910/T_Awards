@@ -48,7 +48,7 @@ model Vote {
   fileUrl    String?
   createdAt  DateTime @default(now())
 
-  user     User     @relation(fields: [userId], references: [id])
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id])
 
   // Un usuario solo puede votar una vez por categoría
@@ -73,6 +73,6 @@ model PointTransaction {
   reason    String
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   game Game? @relation(fields: [gameId], references: [id])
 }
