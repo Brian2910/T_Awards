@@ -4,9 +4,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export function isAdmin(email?: string | null) {
-  return !!email && !!process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL;
+  if (!email) return false;
+  const admins = (process.env.ADMIN_EMAIL ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return admins.includes(email.toLowerCase());
 }
-
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },

@@ -178,6 +178,13 @@ a {
   transition: background 0.15s ease;
 }
 
+button.home-cta {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  appearance: none;
+}
+
 .home-cta:hover {
   background: var(--pink-soft);
 }
