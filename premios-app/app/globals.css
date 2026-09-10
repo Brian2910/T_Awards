@@ -26,6 +26,19 @@ body {
   min-height: 100vh;
 }
 
+body {
+  animation: drift-hearts 40s linear infinite;
+}
+
+@keyframes drift-hearts {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 220px;
+  }
+}
+
 h1,
 h2 {
   font-family: "Fraunces", Georgia, serif;
@@ -195,7 +208,7 @@ button.home-cta {
   font-size: 0.9rem;
 }
 
-.home-secondary button {
+.home-secondary button:not(.home-cta) {
   background: none;
   border: none;
   color: var(--pink-soft);
