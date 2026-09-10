@@ -385,8 +385,8 @@ button.home-cta {
 }
 
 .profile-avatar {
-  width: 110px;
-  height: 110px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--pink);
@@ -398,7 +398,7 @@ button.home-cta {
   justify-content: center;
   background: rgba(0, 0, 0, 0.2);
   color: var(--pink-soft);
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-family: "Fraunces", serif;
 }
 
@@ -495,8 +495,8 @@ button.home-cta {
 }
 
 .ranking-avatar {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -509,7 +509,7 @@ button.home-cta {
   background: rgba(0, 0, 0, 0.25);
   color: var(--pink-soft);
   font-family: "Fraunces", serif;
-  font-size: 0.85rem;
+  font-size: 1.2rem;
 }
 
 /* ---------- Admin ---------- */

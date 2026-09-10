@@ -25,7 +25,7 @@ export default async function VotarPage() {
       <BackLink href="/" label="Inicio" />
       <header className="votar-header">
         <h1>Votá las categorías, trola.</h1>
-        <p>Hola {session.user.name}, elegí tu respuesta en cada categoría.</p>
+        <p>Holiii {session.user.name}, porfi, elige con sumo cuidado tu respuesta en cada categoría.</p>
       </header>
 
       {categories.length === 0 ? (

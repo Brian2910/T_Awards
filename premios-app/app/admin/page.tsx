@@ -45,7 +45,7 @@ export default async function AdminPage() {
         </a>
       </header>
 
-      <AdminPanel
+     <AdminPanel
         initialGames={games}
         initialUsers={users}
         initialTransactions={transactions.map((t) => ({
@@ -53,6 +53,7 @@ export default async function AdminPage() {
           createdAt: t.createdAt.toISOString(),
         }))}
         initialCategories={categories}
+        currentUserId={(session.user as any).id}
       />
     </main>
   );
