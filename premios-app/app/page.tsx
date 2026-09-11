@@ -25,7 +25,6 @@ export default async function Home() {
         <div className="home-secondary">
           {session?.user ? (
             <>
-              <a href="/perfil" className="home-cta">Mi perfil</a>
               {admin && <a href="/admin" className="home-cta">Panel admin</a>}
               <SignOutButton />
             </>

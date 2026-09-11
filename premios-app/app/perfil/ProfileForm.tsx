@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+
 
 interface Props {
   initialName: string;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 export default function ProfileForm({ initialName, initialImage }: Props) {
+  const { update } = useSession();
   const [name, setName] = useState(initialName);
   const [image, setImage] = useState(initialImage);
   const [savingName, setSavingName] = useState(false);
@@ -64,6 +67,7 @@ export default function ProfileForm({ initialName, initialImage }: Props) {
 
     const updated = await res.json();
     setImage(updated.image);
+    await update({ image: updated.image }); // 👈 refresca el JWT/sesión al toque
     setMessage("Foto actualizada.");
   }
 

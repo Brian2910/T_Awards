@@ -35,17 +35,27 @@ export const authOptions: NextAuthOptions = {
         const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
 
-        return { id: user.id, name: user.name, email: user.email };
+        return { id: user.id, name: user.name, email: user.email, image: user.image };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
+        token.id = user.id;
+        token.picture = user.image;
+      }
+      // Permite refrescar la foto sin re-loguearse (ver más abajo)
+      if (trigger === "update" && session?.image) {
+        token.picture = session.image;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) (session.user as any).id = token.id;
+      if (session.user) {
+        (session.user as any).id = token.id;
+        session.user.image = token.picture as string | null;
+      }
       return session;
     },
   },
