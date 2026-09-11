@@ -15,10 +15,19 @@ export default async function VotarPage() {
 
   const [categories, votes] = await Promise.all([
     prisma.category.findMany({ orderBy: { order: "asc" } }),
-    prisma.vote.findMany({ where: { userId }, select: { categoryId: true } }),
+    prisma.vote.findMany({
+      where: { userId },
+      select: {
+        categoryId: true,
+        textAnswer: true,
+        textAnswer2: true,
+        textAnswer3: true,
+        fileUrl: true,
+      },
+    }),
   ]);
 
-  const votedIds = new Set(votes.map((v) => v.categoryId));
+  const voteMap = new Map(votes.map((v) => [v.categoryId, v]));
 
   return (
     <main className="votar-page">
@@ -39,7 +48,7 @@ export default async function VotarPage() {
               name={c.name}
               description={c.description}
               type={c.type}
-              alreadyVoted={votedIds.has(c.id)}
+              existingVote={voteMap.get(c.id) ?? null}
             />
           ))}
         </div>

@@ -4,7 +4,8 @@ import { put } from "@vercel/blob";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/votes -> votos ya emitidos por el usuario logueado (para saber qué le falta votar)
+// GET /api/votes -> votos ya emitidos por el usuario logueado, con el contenido
+// (para poder precargar el formulario si el usuario quiere editar)
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -13,14 +14,19 @@ export async function GET() {
 
   const votes = await prisma.vote.findMany({
     where: { userId: (session.user as any).id },
-    select: { categoryId: true },
+    select: {
+      categoryId: true,
+      textAnswer: true,
+      textAnswer2: true,
+      textAnswer3: true,
+      fileUrl: true,
+    },
   });
 
   return NextResponse.json(votes);
 }
 
-// POST /api/votes -> registra un voto. Espera multipart/form-data:
-// categoryId (string), textAnswer / textAnswer2 / textAnswer3 (string, según tipo), file (File, opcional)
+// POST /api/votes -> registra un voto nuevo (falla si ya existe uno para esta categoría)
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -47,7 +53,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Categoría inexistente." }, { status: 404 });
   }
 
-  // Evita voto duplicado antes de tocar storage
   const already = await prisma.vote.findUnique({
     where: { userId_categoryId: { userId, categoryId } },
   });
@@ -91,6 +96,86 @@ export async function POST(req: Request) {
     data: {
       userId,
       categoryId,
+      textAnswer: textAnswer ?? undefined,
+      textAnswer2: category.type === "TEXT3" ? textAnswer2 ?? undefined : undefined,
+      textAnswer3: category.type === "TEXT3" ? textAnswer3 ?? undefined : undefined,
+      fileUrl,
+    },
+  });
+
+  return NextResponse.json(vote);
+}
+
+// PUT /api/votes -> edita un voto ya existente. Mismo formato que POST.
+// Si es de tipo foto/audio y no se manda un file nuevo, conserva el fileUrl anterior.
+export async function PUT(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+  const userId = (session.user as any).id;
+
+  const formData = await req.formData();
+  const categoryId = formData.get("categoryId") as string | null;
+  const textAnswer = formData.get("textAnswer") as string | null;
+  const textAnswer2 = formData.get("textAnswer2") as string | null;
+  const textAnswer3 = formData.get("textAnswer3") as string | null;
+  const file = formData.get("file") as File | null;
+
+  if (!categoryId) {
+    return NextResponse.json(
+      { error: "Falta indicar la categoría." },
+      { status: 400 }
+    );
+  }
+
+  const category = await prisma.category.findUnique({ where: { id: categoryId } });
+  if (!category) {
+    return NextResponse.json({ error: "Categoría inexistente." }, { status: 404 });
+  }
+
+  const existing = await prisma.vote.findUnique({
+    where: { userId_categoryId: { userId, categoryId } },
+  });
+  if (!existing) {
+    return NextResponse.json(
+      { error: "Todavía no votaste en esta categoría." },
+      { status: 404 }
+    );
+  }
+
+  const isTextType = category.type === "TEXT" || category.type === "TEXT3";
+
+  let fileUrl = existing.fileUrl ?? undefined;
+  if (file && !isTextType) {
+    const blob = await put(`votes/${userId}/${categoryId}-${file.name}`, file, {
+      access: "public",
+    });
+    fileUrl = blob.url;
+  }
+
+  if (category.type === "TEXT" && !textAnswer) {
+    return NextResponse.json(
+      { error: "Esta categoría requiere una respuesta de texto." },
+      { status: 400 }
+    );
+  }
+  if (category.type === "TEXT3" && (!textAnswer || !textAnswer2 || !textAnswer3)) {
+    return NextResponse.json(
+      { error: "Esta categoría requiere completar los 3 campos de texto." },
+      { status: 400 }
+    );
+  }
+  if (!isTextType && !fileUrl) {
+    return NextResponse.json(
+      { error: "Esta categoría requiere subir un archivo." },
+      { status: 400 }
+    );
+  }
+
+  const vote = await prisma.vote.update({
+    where: { userId_categoryId: { userId, categoryId } },
+    data: {
       textAnswer: textAnswer ?? undefined,
       textAnswer2: category.type === "TEXT3" ? textAnswer2 ?? undefined : undefined,
       textAnswer3: category.type === "TEXT3" ? textAnswer3 ?? undefined : undefined,

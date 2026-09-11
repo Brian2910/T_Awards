@@ -4,24 +4,50 @@ import { useState } from "react";
 
 type CategoryType = "TEXT" | "TEXT3" | "PHOTO" | "AUDIO";
 
+interface ExistingVote {
+  textAnswer: string | null;
+  textAnswer2: string | null;
+  textAnswer3: string | null;
+  fileUrl: string | null;
+}
+
 interface Props {
   categoryId: string;
   name: string;
   description: string | null;
   type: CategoryType;
-  alreadyVoted: boolean;
+  existingVote: ExistingVote | null;
 }
 
-export default function VoteCard({ categoryId, name, description, type, alreadyVoted }: Props) {
+export default function VoteCard({ categoryId, name, description, type, existingVote }: Props) {
   const [open, setOpen] = useState(false);
-  const [textAnswer, setTextAnswer] = useState("");
-  const [textAnswer2, setTextAnswer2] = useState("");
-  const [textAnswer3, setTextAnswer3] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [hasVote, setHasVote] = useState(Boolean(existingVote));
+  const [currentFileUrl, setCurrentFileUrl] = useState(existingVote?.fileUrl ?? null);
+
+  const [textAnswer, setTextAnswer] = useState(existingVote?.textAnswer ?? "");
+  const [textAnswer2, setTextAnswer2] = useState(existingVote?.textAnswer2 ?? "");
+  const [textAnswer3, setTextAnswer3] = useState(existingVote?.textAnswer3 ?? "");
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
-    alreadyVoted ? "done" : "idle"
-  );
+
+  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+
+  const isFileType = type === "PHOTO" || type === "AUDIO";
+  const showForm = editing || (!hasVote && open);
+
+  function startEditing() {
+    setTextAnswer(existingVote?.textAnswer ?? "");
+    setTextAnswer2(existingVote?.textAnswer2 ?? "");
+    setTextAnswer3(existingVote?.textAnswer3 ?? "");
+    setFile(null);
+    setEditing(true);
+  }
+
+  function cancelEditing() {
+    setEditing(false);
+    setError(null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,36 +67,39 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
     }
 
     const res = await fetch("/api/votes", {
-      method: "POST",
+      method: hasVote ? "PUT" : "POST",
       body: formData,
     });
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "No se pudo registrar el voto. Intentá de nuevo.");
+      setError(data.error ?? "No se pudo guardar. Intentá de nuevo.");
       setStatus("error");
       return;
     }
 
-    setStatus("done");
+    const saved = await res.json();
+    setCurrentFileUrl(saved.fileUrl ?? currentFileUrl);
+    setStatus("idle");
+    setHasVote(true);
+    setEditing(false);
     setOpen(false);
   }
 
   const typeLabel = { TEXT: "Texto", TEXT3: "Texto", PHOTO: "Foto", AUDIO: "Audio" }[type];
-  const isDone = status === "done";
 
   return (
     <div className="vote-card">
       <button
         type="button"
         className="vote-card-header"
-        onClick={() => !isDone && setOpen(!open)}
-        disabled={isDone}
+        onClick={() => !hasVote && setOpen(!open)}
+        disabled={hasVote}
       >
         <div className="vote-card-header-text">
           <h2>{name}</h2>
         </div>
-        {isDone ? (
+        {hasVote ? (
           <span className="vote-card-check">✓</span>
         ) : (
           <span className={`vote-card-chevron ${open ? "vote-card-chevron-open" : ""}`}>
@@ -79,9 +108,16 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
         )}
       </button>
 
-      {isDone && <p className="vote-card-done">Voto registrado ✓</p>}
+      {hasVote && !editing && (
+        <div className="vote-card-done-row">
+          <p className="vote-card-done">Voto registrado ✓</p>
+          <button type="button" className="vote-card-edit-link" onClick={startEditing}>
+            Editar respuesta
+          </button>
+        </div>
+      )}
 
-      {!isDone && open && (
+      {showForm && (
         <div className="vote-card-body">
           {description && <p className="vote-card-desc">{description}</p>}
 
@@ -122,29 +158,38 @@ export default function VoteCard({ categoryId, name, description, type, alreadyV
               </>
             )}
 
-            {type === "PHOTO" && (
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                required
-              />
-            )}
-
-            {type === "AUDIO" && (
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                required
-              />
+            {isFileType && (
+              <>
+                {editing && currentFileUrl && (
+                  <p className="vote-card-current-file">
+                    Archivo actual:{" "}
+                    <a href={currentFileUrl} target="_blank" rel="noreferrer">
+                      verlo
+                    </a>{" "}
+                    (subí uno nuevo solo si querés reemplazarlo)
+                  </p>
+                )}
+                <input
+                  type="file"
+                  accept={type === "PHOTO" ? "image/*" : "audio/*"}
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                  required={!editing}
+                />
+              </>
             )}
 
             {error && <p className="vote-card-error">{error}</p>}
 
-            <button type="submit" disabled={status === "sending"}>
-              {status === "sending" ? "Enviando..." : "Votar"}
-            </button>
+            <div className="vote-card-actions">
+              <button type="submit" disabled={status === "sending"}>
+                {status === "sending" ? "Guardando..." : editing ? "Guardar cambios" : "Votar"}
+              </button>
+              {editing && (
+                <button type="button" className="vote-card-cancel" onClick={cancelEditing}>
+                  Cancelar
+                </button>
+              )}
+            </div>
           </form>
         </div>
       )}

@@ -52,7 +52,7 @@ export default function RegistroPage() {
       <div className="auth-wrap">
         <BackLink href="/" label="Inicio" />
         <form className="auth-form" onSubmit={handleSubmit}>
-        <img src="/trolas-awards-logo.gif" alt="Trolas Awards" className="brand-logo" />
+        <img src="/trolas-awards-logo.png" alt="Trolas Awards" className="brand-logo" />
         <p className="auth-subtitle">Creá tu cuenta para votar en las categorías de la ceremonia.</p>
 
         <label>

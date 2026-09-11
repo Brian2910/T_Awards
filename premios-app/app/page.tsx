@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <main className="home-page">
       <div className="home-content">
-        <img src="/trolas-awards-logo.gif" alt="Trolas Awards" className="brand-logo" />
+        <img src="/trolas-awards-logo.png" alt="Trolas Awards" className="brand-logo" />
 
         <p className="home-tagline">
           Elegí a tus favoritos en cada categoría. Necesitás una cuenta para votar,
