@@ -110,7 +110,6 @@ export default function VoteCard({ categoryId, name, description, type, existing
 
       {hasVote && !editing && (
         <div className="vote-card-done-row">
-          <p className="vote-card-done">Voto registrado ✓</p>
           <button type="button" className="vote-card-edit-link" onClick={startEditing}>
             Editar respuesta
           </button>

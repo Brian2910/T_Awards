@@ -69,15 +69,22 @@ export default function AdminPanel({
   const [gameError, setGameError] = useState<string | null>(null);
   const [gameMessage, setGameMessage] = useState<string | null>(null);
 
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState("");
   const [categoryDesc, setCategoryDesc] = useState("");
   const [categoryType, setCategoryType] = useState<CategoryType>("TEXT");
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [categoryMessage, setCategoryMessage] = useState<string | null>(null);
-
-  const [selectedUser, setSelectedUser] = useState(initialUsers[0]?.id ?? "");
-  const [selectedGame, setSelectedGame] = useState("");
+  const [editCatName, setEditCatName] = useState("");
+  const [editCatDesc, setEditCatDesc] = useState("");
+  const [editCatType, setEditCatType] = useState<CategoryType>("TEXT");
+  const [savingCategoryId, setSavingCategoryId] = useState<string | null>(null);
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [categoryActionError, setCategoryActionError] = useState<string | null>(null);
+  const [categoryActionMessage, setCategoryActionMessage] = useState<string | null>(null);  const [selectedUser, setSelectedUser] = useState(initialUsers[0]?.id ?? "");
+  
+const [selectedGame, setSelectedGame] = useState("");
   const [points, setPoints] = useState(10);
   const [reason, setReason] = useState("");
   const [awarding, setAwarding] = useState(false);
@@ -227,6 +234,80 @@ export default function AdminPanel({
     setUserMessage("Usuario eliminado.");
   }
 
+  function handleStartEditCategory(cat: Category) {
+  setEditingCategoryId(cat.id);
+  setEditCatName(cat.name);
+  setEditCatDesc(cat.description ?? "");
+  setEditCatType(cat.type);
+  setCategoryActionError(null);
+  setCategoryActionMessage(null);
+}
+
+function handleCancelEditCategory() {
+  setEditingCategoryId(null);
+}
+
+async function handleSaveCategoryEdit(id: string) {
+  setCategoryActionError(null);
+  setCategoryActionMessage(null);
+  setSavingCategoryId(id);
+
+  const res = await fetch(`/api/categories/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: editCatName,
+      description: editCatDesc || undefined,
+      type: editCatType,
+    }),
+  });
+
+  setSavingCategoryId(null);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    setCategoryActionError(data.error ?? "No se pudo actualizar la categoría.");
+    return;
+  }
+
+  const updated = await res.json();
+  setCategories(categories.map((c) => (c.id === id ? updated : c)));
+  setEditingCategoryId(null);
+  setCategoryActionMessage("Categoría actualizada.");
+}
+
+async function handleDeleteCategory(cat: Category, force = false) {
+  if (!force && !window.confirm(`¿Eliminar la categoría "${cat.name}"?`)) return;
+
+  setCategoryActionError(null);
+  setCategoryActionMessage(null);
+  setDeletingCategoryId(cat.id);
+
+  const res = await fetch(`/api/categories/${cat.id}${force ? "?force=true" : ""}`, {
+    method: "DELETE",
+  });
+
+  setDeletingCategoryId(null);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 409 && data.voteCount) {
+      const confirmForce = window.confirm(
+        `${data.error} ¿Eliminar la categoría junto con esos votos? Esta acción no se puede deshacer.`
+      );
+      if (confirmForce) {
+        await handleDeleteCategory(cat, true);
+      }
+      return;
+    }
+    setCategoryActionError(data.error ?? "No se pudo eliminar la categoría.");
+    return;
+  }
+
+  setCategories(categories.filter((c) => c.id !== cat.id));
+  setCategoryActionMessage("Categoría eliminada.");
+}
+
   return (
     <div className="admin-layout">
       <section className="admin-card">
@@ -261,6 +342,74 @@ export default function AdminPanel({
             {creatingCategory ? "Creando..." : "Crear categoría"}
           </button>
         </form>
+
+        <ul className="admin-list admin-categories-list">
+          {categories.map((cat) => (
+            <li key={cat.id} className="admin-category-row">
+              {editingCategoryId === cat.id ? (
+                <div className="admin-category-edit-form">
+                  <input value={editCatName} onChange={(e) => setEditCatName(e.target.value)} />
+                  <input
+                    value={editCatDesc}
+                    onChange={(e) => setEditCatDesc(e.target.value)}
+                    placeholder="Descripción (opcional)"
+                  />
+                  <select
+                    value={editCatType}
+                    onChange={(e) => setEditCatType(e.target.value as CategoryType)}
+                  >
+                    {CATEGORY_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="admin-category-edit-actions">
+                    <button
+                      type="button"
+                      onClick={() => handleSaveCategoryEdit(cat.id)}
+                      disabled={savingCategoryId === cat.id}
+                    >
+                      {savingCategoryId === cat.id ? "Guardando..." : "Guardar"}
+                    </button>
+                    <button type="button" className="admin-delete-btn" onClick={handleCancelEditCategory}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span>
+                    <strong>{cat.name}</strong>{" "}
+                    <span className="admin-user-email">
+                      ({CATEGORY_TYPE_OPTIONS.find((o) => o.value === cat.type)?.label ?? cat.type})
+                    </span>
+                    {cat.description ? ` — ${cat.description}` : ""}
+                  </span>
+                  <div className="admin-category-actions">
+                    <button type="button" onClick={() => handleStartEditCategory(cat)}>
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-delete-btn"
+                      onClick={() => handleDeleteCategory(cat)}
+                      disabled={deletingCategoryId === cat.id}
+                    >
+                      {deletingCategoryId === cat.id ? "Eliminando..." : "Eliminar"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {(categoryActionError || categoryActionMessage) && (
+          <p className={categoryActionError ? "vote-card-error" : "profile-message"}>
+            {categoryActionError ?? categoryActionMessage}
+          </p>
+        )}
 
         {(categoryError || categoryMessage) && (
           <p className={categoryError ? "vote-card-error" : "profile-message"}>

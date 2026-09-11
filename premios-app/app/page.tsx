@@ -16,7 +16,7 @@ export default async function Home() {
           y cada voto queda guardado a tu nombre.
         </p>
 
-        {session?.user && <p className="home-greeting">Hola, {session.user.name}</p>}
+        {session?.user && <p className="home-greeting">Holiii, {session.user.name}</p>}
 
         <a href="/votar" className="home-cta">
           Ir a votar

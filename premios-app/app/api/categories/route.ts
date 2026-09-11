@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions, isAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/categories -> lista todas las categorías, ordenadas
 export async function GET() {
   const categories = await prisma.category.findMany({
     orderBy: { order: "asc" },
@@ -9,8 +10,12 @@ export async function GET() {
   return NextResponse.json(categories);
 }
 
-// POST /api/categories -> crea una categoría (uso administrativo)
 export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!isAdmin(session?.user?.email)) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
+  }
+
   const { name, description, type, order } = await req.json();
 
   if (!name || !type) {
