@@ -351,8 +351,9 @@ button.home-cta {
 .vote-card-done-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.75rem;
+  margin-top: auto;
 }
 
 .vote-card-edit-link {
