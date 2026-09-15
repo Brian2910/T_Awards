@@ -2,18 +2,32 @@ import { getServerSession } from "next-auth";
 import { authOptions, isAdmin } from "@/lib/auth";
 import SignOutButton from "./SignOutButton";
 import PhotoCarousel from "./components/PhotoCarousel";
+import fs from "fs";
+import path from "path";
 
-const GALLERY_PHOTOS = [
-  { src: "/gallery/foto1.png", alt: "Foto 1" },
-  { src: "/gallery/foto2.jpg", alt: "Foto 2" },
-  { src: "/gallery/foto3.jpg", alt: "Foto 3" },
-  { src: "/gallery/foto4.jpg", alt: "Foto 4" },
+const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
-];
+function getGalleryPhotos() {
+  const dir = path.join(process.cwd(), "public", "gallery");
+
+  let files: string[] = [];
+  try {
+    files = fs.readdirSync(dir);
+  } catch {
+    return [];
+  }
+
+  return files
+    .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
+    .sort()
+    .map((file) => ({ src: `/gallery/${file}`, alt: file }));
+}
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
   const admin = isAdmin(session?.user?.email);
+  const galleryPhotos = getGalleryPhotos();
+
 
   return (
     <main className="home-page">
@@ -35,7 +49,6 @@ export default async function Home() {
           <div className="home-secondary">
             {session?.user ? (
               <>
-                <a href="/perfil" className="home-cta">Mi perfil</a>
                 {admin && <a href="/admin" className="home-cta">Panel admin</a>}
                 <SignOutButton />
               </>
@@ -55,7 +68,7 @@ export default async function Home() {
 
       <section id="galeria" className="home-gallery">
         <h2 className="home-gallery-title">Galería</h2>
-        <PhotoCarousel photos={GALLERY_PHOTOS} />
+        <PhotoCarousel photos={galleryPhotos} />
       </section>
     </main>
   );
