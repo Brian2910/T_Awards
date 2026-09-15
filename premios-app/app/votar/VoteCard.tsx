@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type CategoryType = "TEXT" | "TEXT3" | "PHOTO" | "AUDIO";
 
@@ -24,6 +24,11 @@ export default function VoteCard({ categoryId, name, description, type, existing
   const [editing, setEditing] = useState(false);
   const [hasVote, setHasVote] = useState(Boolean(existingVote));
   const [currentFileUrl, setCurrentFileUrl] = useState(existingVote?.fileUrl ?? null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+  audioRef.current = new Audio("/sounds/The-Category-is-Dance-or-Die.mp3");}, []);
+
 
   const [textAnswer, setTextAnswer] = useState(existingVote?.textAnswer ?? "");
   const [textAnswer2, setTextAnswer2] = useState(existingVote?.textAnswer2 ?? "");
@@ -51,8 +56,12 @@ export default function VoteCard({ categoryId, name, description, type, existing
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setStatus("sending");
+    if (!editing) {
+  audioRef.current?.play().catch((err) => console.error("Error reproduciendo audio:", err));
+}
+
+  setError(null);
+  setStatus("sending");
 
     const formData = new FormData();
     formData.append("categoryId", categoryId);
