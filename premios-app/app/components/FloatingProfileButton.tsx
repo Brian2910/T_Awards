@@ -22,37 +22,11 @@ export default function FloatingProfileButton({ name, image }: Props) {
     .toUpperCase();
 
   return (
-    <Link
-      href="/perfil"
-      aria-label="Mi perfil"
-      style={{
-        position: "fixed",
-        top: 20,
-        left: 20,
-        zIndex: 1000,
-        width: 200,
-        height: 200,
-        borderRadius: "50%",
-        overflow: "hidden",
-        border: "6px solid #f9a8d4",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#ec4899",
-        textDecoration: "none",
-      }}
-    >
+    <Link href="/perfil" aria-label="Mi perfil" className="floating-profile-btn">
       {image ? (
-        <img
-          src={image}
-          alt={name ?? "Perfil"}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+        <img src={image} alt={name ?? "Perfil"} />
       ) : (
-        <span style={{ color: "#fff", fontWeight: 700, fontSize: 56 }}>
-          {initials}
-        </span>
+        <span className="floating-profile-btn-initials">{initials}</span>
       )}
     </Link>
   );
