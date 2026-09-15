@@ -50,18 +50,23 @@ export default function PhotoCarousel({ photos }: Props) {
         <div
           style={{
             width: 480,
-            maxWidth: "60vw",
-            aspectRatio: "4 / 3",
+            maxWidth: "70vw",
+            height: 480,
+            maxHeight: "60vh",
             borderRadius: 16,
             overflow: "hidden",
             boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             border: "3px solid #f9a8d4",
+            backgroundColor: "rgba(0,0,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <img
             src={photos[index].src}
             alt={photos[index].alt}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
           />
         </div>
 

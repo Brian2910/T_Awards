@@ -4,6 +4,14 @@ import SignOutButton from "./SignOutButton";
 import PhotoCarousel from "./components/PhotoCarousel";
 import fs from "fs";
 import path from "path";
+import VideoGallery from "./components/VideoGallery";
+
+const VIDEOS = [
+  { url: "https://drive.google.com/file/d/1nQmLARgFU2HavuqRThkIIO6TvlDh4SOJ/view?usp=sharing", title: "Gemelas Asesinas" },
+  { url: "https://drive.google.com/file/d/1pBe1E6ikFaK7vZbA_XzLfWwu0rkJm4cz/view?usp=sharing", title: "Dueto: Paloma y Lourdes" },
+  { url: "https://drive.google.com/file/d/1n4k-Oqk37-w5PTJ7Ow71cBf-OYiSoju-/view?usp=sharing", title: "Trolas Awards: 2023" },
+
+];
 
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
 
@@ -18,9 +26,9 @@ function getGalleryPhotos() {
   }
 
   return files
-    .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
-    .sort()
-    .map((file) => ({ src: `/gallery/${file}`, alt: file }));
+  .filter((file) => IMAGE_EXTENSIONS.includes(path.extname(file).toLowerCase()))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+  .map((file) => ({ src: `/gallery/${file}`, alt: file }));
 }
 
 export default async function Home() {
@@ -67,9 +75,14 @@ export default async function Home() {
       </section>
 
       <section id="galeria" className="home-gallery">
-        <h2 className="home-gallery-title">Galería</h2>
+        <h2 className="home-gallery-title">Galería de la Banda Peronista</h2>
         <PhotoCarousel photos={galleryPhotos} />
       </section>
+
+      <section className="home-gallery">
+          <h2 className="home-gallery-title">Videos de la Banda Peronista</h2>
+          <VideoGallery videos={VIDEOS} />
+        </section>
     </main>
   );
 }
